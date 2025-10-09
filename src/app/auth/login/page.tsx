@@ -18,6 +18,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import service from "./services/authenticator.service";
+import { LoginBody, LoginResponse } from "./types/types";
 
 export default function LoginPage() {
   const [loading, setLoading] = React.useState(false);
@@ -25,9 +27,26 @@ export default function LoginPage() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    // TODO: integrar com sua ação de login (credentials/OAuth)
-    await new Promise((r) => setTimeout(r, 900));
-    setLoading(false);
+
+    const body: LoginBody = {
+      login: (e.currentTarget.elements.namedItem("email") as HTMLInputElement)
+        .value,
+      password: (
+        e.currentTarget.elements.namedItem("password") as HTMLInputElement
+      ).value,
+    };
+
+    service
+      .post<LoginBody, LoginResponse>(body)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((err: any) => {
+        console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
 
   return (
@@ -38,7 +57,7 @@ export default function LoginPage() {
 
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Bem-vindo</CardTitle>
+          <CardTitle className="text-2xl">Fast Finance</CardTitle>
           <CardDescription>Faça login para continuar</CardDescription>
         </CardHeader>
 
@@ -102,33 +121,7 @@ export default function LoginPage() {
               {loading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
-
-          <div className="my-6">
-            <div className="flex items-center gap-2">
-              <Separator className="flex-1" />
-              <span className="text-xs text-muted-foreground">
-                ou continue com
-              </span>
-              <Separator className="flex-1" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" type="button" className="w-full">
-              <Github className="mr-2 h-4 w-4" />
-              GitHub
-            </Button>
-            <Button variant="outline" type="button" className="w-full">
-              <Twitter className="mr-2 h-4 w-4" />
-              Twitter
-            </Button>
-          </div>
         </CardContent>
-
-        <CardFooter className="justify-center text-xs text-muted-foreground">
-          Ao continuar, você concorda com nossos Termos e Política de
-          Privacidade.
-        </CardFooter>
       </Card>
     </div>
   );
