@@ -1,8 +1,9 @@
 "use client";
 import { useTheme } from "next-themes";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun } from "lucide-react";
+import Cookies from "js-cookie";
 
 const SwitcherTheme = () => {
   const { theme, setTheme } = useTheme();
@@ -13,6 +14,14 @@ const SwitcherTheme = () => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    const savedTheme = Cookies.get("theme");
+    if (savedTheme) {
+      setTheme(savedTheme as "light" | "dark");
+    }
+    setTheme(Cookies.get("theme") as "light" | "dark");
+  }, []);
+
   if (!mounted) {
     return null; // ou um skeleton
   }
@@ -21,7 +30,11 @@ const SwitcherTheme = () => {
     <div className="flex items-center justify-center rounded-2xl">
       <Button
         id="theme-toggle"
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        onClick={() => {
+          const newTheme = theme === "dark" ? "light" : "dark";
+          setTheme(newTheme);
+          Cookies.set("theme", newTheme);
+        }}
         variant="outline"
         size="icon"
         className="rounded-full p-2"
