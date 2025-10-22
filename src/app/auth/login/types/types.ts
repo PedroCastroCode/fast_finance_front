@@ -4,5 +4,6 @@ export interface LoginBody {
 }
 
 export interface LoginResponse {
-  token: string;
+  Token: string;
+  RefreshToken: string;
 }

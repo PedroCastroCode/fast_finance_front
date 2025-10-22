@@ -2,16 +2,14 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Mail, Lock, Github, Twitter } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Mail, Lock } from "lucide-react";
 import SwitcherTheme from "@/components/SwitcherTheme";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -20,9 +18,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import service from "./services/authenticator.service";
 import { LoginBody, LoginResponse } from "./types/types";
+import Cookies from "js-cookie";
 
 export default function LoginPage() {
   const [loading, setLoading] = React.useState(false);
+  const router = useRouter();
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -39,7 +39,11 @@ export default function LoginPage() {
     service
       .post<LoginBody, LoginResponse>(body)
       .then((response) => {
-        console.log(response.data);
+        Cookies.set("Token", response.data.Token);
+        Cookies.set("RefreshToken", response.data.RefreshToken);
+        
+        // Redirecionar para o dashboard após login bem-sucedido
+        router.push("/dashboard");
       })
       .catch((err: any) => {
         console.error(err);
